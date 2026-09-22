@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>El Mordisco - Productos</title>
+</head>
+<body>
+
+    <h1>EL MORDISCO</h1>
+    <h2>Gestión de Productos</h2>
+
+    <h3>Registrar producto</h3>
+
+    <form id="formProducto">
+
+        <input type="hidden" id="idProducto">
+
+        <label>Nombre:</label>
+        <input type="text" id="nombre" required>
+        <br><br>
+
+        <label>Categoría:</label>
+        <input type="text" id="categoria" required>
+        <br><br>
+
+        <label>Precio:</label>
+        <input type="number" id="precio" step="0.01" required>
+        <br><br>
+
+        <label>Stock:</label>
+        <input type="number" id="stock" required>
+        <br><br>
+
+        <button type="submit" id="botonGuardar">Guardar producto</button>
+        <button type="button" onclick="cancelarEdicion()">Cancelar</button>
+
+    </form>
+
+    <h3>Productos registrados</h3>
+
+    <ul id="listaProductos"></ul>
+
+    <script>
+
+        // Cargar todos los productos desde la base de datos
+        function cargarProductos() {
+
+            fetch('/api/productos')
+                .then(response => response.json())
+                .then(productos => {
+
+                    const lista = document.getElementById('listaProductos');
+
+                    lista.innerHTML = '';
+
+                    productos.forEach(producto => {
+
+                        const elemento = document.createElement('li');
+
+                        elemento.innerHTML =
+                            producto.nombre + ' - ' +
+                            producto.categoria + ' - $' +
+                            producto.precio + ' - Stock: ' +
+                            producto.stock +
+                            ' ';
+
+                        // Botón para editar
+                        const botonEditar = document.createElement('button');
+
+                        botonEditar.textContent = 'Editar';
+
+                        botonEditar.onclick = function () {
+                            editarProducto(producto);
+                        };
+
+                        // Botón para eliminar
+                        const botonEliminar = document.createElement('button');
+
+                        botonEliminar.textContent = 'Eliminar';
+
+                        botonEliminar.onclick = function () {
+                            eliminarProducto(producto.idProducto);
+                        };
+
+                        elemento.appendChild(botonEditar);
+                        elemento.appendChild(botonEliminar);
+
+                        lista.appendChild(elemento);
+                    });
+                });
+        }
+
+
+        // Guardar o actualizar un producto
+        document.getElementById('formProducto').addEventListener(
+            'submit',
+            function(event) {
+
+                event.preventDefault();
+
+                const id = document.getElementById('idProducto').value;
+
+                const producto = {
+
+                    nombre: document.getElementById('nombre').value,
+
+                    categoria: document.getElementById('categoria').value,
+
+                    precio: parseFloat(
+                        document.getElementById('precio').value
+                    ),
+
+                    stock: parseInt(
+                        document.getElementById('stock').value
+                    )
+                };
+
+
+                // Si existe ID, actualizamos
+                if (id) {
+
+                    fetch('/api/productos/' + id, {
+
+                        method: 'PUT',
+
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+
+                        body: JSON.stringify(producto)
+
+                    })
+                    .then(response => response.json())
+                    .then(() => {
+
+                        alert('Producto actualizado correctamente.');
+
+                        cancelarEdicion();
+
+                        cargarProductos();
+                    });
+
+                }
+
+                // Si no existe ID, creamos un producto
+                else {
+
+                    fetch('/api/productos', {
+
+                        method: 'POST',
+
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+
+                        body: JSON.stringify(producto)
+
+                    })
+                    .then(response => response.json())
+                    .then(() => {
+
+                        alert('Producto guardado correctamente.');
+
+                        document.getElementById('formProducto').reset();
+
+                        cargarProductos();
+                    });
+                }
+            }
+        );
+
+
+        // Cargar los datos del producto en el formulario
+        function editarProducto(producto) {
+
+            document.getElementById('idProducto').value =
+                producto.idProducto;
+
+            document.getElementById('nombre').value =
+                producto.nombre;
+
+            document.getElementById('categoria').value =
+                producto.categoria;
+
+            document.getElementById('precio').value =
+                producto.precio;
+
+            document.getElementById('stock').value =
+                producto.stock;
+
+            document.getElementById('botonGuardar').textContent =
+                'Actualizar producto';
+        }
+
+
+        // Eliminar un producto
+        function eliminarProducto(id) {
+
+            if (!confirm('¿Deseas eliminar este producto?')) {
+                return;
+            }
+
+            fetch('/api/productos/' + id, {
+
+                method: 'DELETE'
+
+            })
+            .then(() => {
+
+                alert('Producto eliminado correctamente.');
+
+                cargarProductos();
+            });
+        }
+
+
+        // Cancelar la edición
+        function cancelarEdicion() {
+
+            document.getElementById('formProducto').reset();
+
+            document.getElementById('idProducto').value = '';
+
+            document.getElementById('botonGuardar').textContent =
+                'Guardar producto';
+        }
+
+
+        // Mostrar productos al abrir la página
+        cargarProductos();
+
+    </script>
+
+</body>
+</html>
