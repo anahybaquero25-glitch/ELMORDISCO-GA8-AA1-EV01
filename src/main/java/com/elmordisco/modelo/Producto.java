@@ -6,6 +6,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Column;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 /**
  * Entidad que representa un producto de El Mordisco.
@@ -20,10 +24,19 @@ public class Producto {
 @Column(name = "id_producto")
 private Integer idProducto;
 
-    private String nombre;
-    private String categoria;
-    private Double precio;
-    private Integer stock;
+    @NotBlank(message = "El nombre es obligatorio")
+private String nombre;
+
+@NotBlank(message = "La categoria es obligatoria")
+private String categoria;
+
+@NotNull(message = "El precio es obligatorio")
+@Positive(message = "El precio debe ser mayor que cero")
+private Double precio;
+
+@NotNull(message = "El stock es obligatorio")
+@Min(value = 0, message = "El stock no puede ser negativo")
+private Integer stock;
 
     // Constructor vacío requerido por JPA
     public Producto() {

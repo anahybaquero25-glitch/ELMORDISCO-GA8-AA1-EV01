@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.util.List;
+import jakarta.validation.Valid;
 
 /**
  * Controlador REST para gestionar los productos de El Mordisco.
@@ -44,7 +45,7 @@ public class ProductoController {
      * @return producto guardado
      */
     @PostMapping
-    public Producto guardarProducto(@RequestBody Producto producto) {
+    public Producto guardarProducto(@Valid @RequestBody Producto producto) {
         return productoService.guardarProducto(producto);
     }
     /**
@@ -57,7 +58,7 @@ public class ProductoController {
 @PutMapping("/{id}")
 public Producto actualizarProducto(
         @PathVariable Integer id,
-        @RequestBody Producto producto) {
+        @Valid @RequestBody Producto producto) {
 
     producto.setIdProducto(id);
     return productoService.guardarProducto(producto);

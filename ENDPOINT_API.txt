@@ -1,0 +1,60 @@
+EVIDENCIA GA7-220501096-AA5-EV02
+ENDPOINTS DEL API - PROYECTO EL MORDISCO
+
+==================================================
+1. ENDPOINT DE REGISTRO
+==================================================
+
+Método: POST
+
+URL:
+http://localhost:8081/api/auth/registro
+
+Descripción:
+Permite registrar un nuevo usuario en el sistema.
+
+Datos de entrada:
+
+{
+    "usuario": "usuarioev02.",
+    "contrasena": "123456"
+}
+
+
+==================================================
+2. ENDPOINT DE INICIO DE SESIÓN
+==================================================
+
+Método: POST
+
+URL:
+http://localhost:8081/api/auth/login
+
+Descripción:
+Permite realizar la autenticación de un usuario
+mediante su nombre de usuario y contraseña.
+
+Datos de entrada:
+
+{
+    "usuario": "usuarioev02.",
+    "contrasena": "123456"
+}
+
+
+==================================================
+RESUMEN
+==================================================
+
+Endpoint 1:
+POST http://localhost:8081/api/auth/registro
+
+Función:
+Registro de usuarios.
+
+
+Endpoint 2:
+POST http://localhost:8081/api/auth/login
+
+Función:
+Inicio de sesión y autenticación de usuarios.
