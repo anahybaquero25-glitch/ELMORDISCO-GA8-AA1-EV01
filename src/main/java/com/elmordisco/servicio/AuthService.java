@@ -2,6 +2,7 @@ package com.elmordisco.servicio;
 
 import com.elmordisco.modelo.Usuario;
 import com.elmordisco.repositorio.UsuarioRepository;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 /**
@@ -12,14 +13,19 @@ import org.springframework.stereotype.Service;
 public class AuthService {
 
     private final UsuarioRepository usuarioRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
 
-    // Constructor para inyectar el repositorio.
+    // Constructor para inyectar el repositorio y configurar BCrypt.
     public AuthService(UsuarioRepository usuarioRepository) {
         this.usuarioRepository = usuarioRepository;
+        this.passwordEncoder = new BCryptPasswordEncoder();
     }
 
     /**
      * Registra un nuevo usuario.
+     *
+     * @param usuario usuario que se desea registrar
+     * @return mensaje indicando el resultado del registro
      */
     public String registrar(Usuario usuario) {
 
@@ -48,6 +54,11 @@ public class AuthService {
             return "El usuario ya existe";
         }
 
+        // Ciframos la contraseña antes de almacenarla.
+        usuario.setContrasena(
+                passwordEncoder.encode(usuario.getContrasena())
+        );
+
         // Guardamos el nuevo usuario en la base de datos.
         usuarioRepository.save(usuario);
 
@@ -56,6 +67,10 @@ public class AuthService {
 
     /**
      * Verifica las credenciales para iniciar sesión.
+     *
+     * @param nombreUsuario nombre del usuario
+     * @param contrasena contraseña ingresada
+     * @return mensaje indicando el resultado de la autenticación
      */
     public String iniciarSesion(String nombreUsuario, String contrasena) {
 
@@ -74,8 +89,11 @@ public class AuthService {
             return "Error en la autenticación";
         }
 
-        // Comparamos la contraseña ingresada con la almacenada.
-        if (!usuario.getContrasena().equals(contrasena)) {
+        // Comparamos la contraseña ingresada con el hash almacenado.
+        if (!passwordEncoder.matches(
+                contrasena,
+                usuario.getContrasena())) {
+
             return "Error en la autenticación";
         }
 
